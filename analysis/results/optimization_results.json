@@ -1,0 +1,62 @@
+{
+  "global_best": {
+    "hit": [
+      "BCL2",
+      "SRC",
+      "NFkB",
+      "JAK"
+    ],
+    "loc": "senescent",
+    "score": 100
+  },
+  "route_optima": {
+    "systemic": {
+      "hit": [
+        "HSP90",
+        "GLS1",
+        "p38",
+        "NLRP3"
+      ],
+      "eff": 90,
+      "n_aes": 3,
+      "n_serious": 0,
+      "score": 67,
+      "adverse_effects": {
+        "Hepatotoxicity": "moderate",
+        "GI upset": "low",
+        "Infection risk": "moderate"
+      }
+    },
+    "protac": {
+      "hit": [
+        "BCLxL",
+        "HSP90",
+        "GLS1",
+        "p38"
+      ],
+      "eff": 100,
+      "n_aes": 3,
+      "n_serious": 0,
+      "score": 77,
+      "adverse_effects": {
+        "Loss of beneficial senescence": "moderate",
+        "Hepatotoxicity": "moderate",
+        "GI upset": "low"
+      }
+    },
+    "senescent": {
+      "hit": [
+        "BCL2",
+        "SRC",
+        "NFkB",
+        "JAK"
+      ],
+      "eff": 100,
+      "n_aes": 0,
+      "n_serious": 0,
+      "score": 100,
+      "adverse_effects": {}
+    }
+  },
+  "n_designs_evaluated": 98301
+}

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Senotherapeutic Placeholder Drug Designer — Inflammaging</title>
+<style>
+  :root{
+    --bg:#ffffff;--panel:#f5f7fa;--panel2:#eef2f7;--node:#ffffff;--nodeStroke:#d8dee7;
+    --ink:#161b22;--muted:#5b6470;--grid:#e6ebf1;
+    --lytic:#9b5de5;--morphic:#159a8a;--tissue:#7a8595;
+    --serious:#c4392f;--moderate:#dd9a1f;--low:#6b7480;--benefit:#2f9e44;
+  }
+  body.dark{
+    --bg:#11161d;--panel:#1a212b;--panel2:#222c37;--node:#232c38;--nodeStroke:#39424f;
+    --ink:#e8edf3;--muted:#9aa6b2;--grid:#2a323d;
+    --lytic:#b57edc;--morphic:#33c3b0;--tissue:#96a1ae;
+    --serious:#e56b62;--moderate:#f0c15a;--low:#8a94a1;--benefit:#51cf66;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1320px;margin:0 auto;padding:20px 20px 60px}
+  h1{font-size:18px;margin:0 0 3px;letter-spacing:-.2px}
+  .sub{font-size:12px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+  .topbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--grid);border-radius:10px;padding:9px 14px;margin-bottom:14px}
+  .lbl{color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;font-size:10px}
+  .modewrap{display:flex;border:1px solid var(--nodeStroke);border-radius:8px;overflow:hidden}
+  .modewrap .btn{border:0;border-radius:0}
+  .btn{padding:5px 12px;border-radius:7px;border:1px solid var(--nodeStroke);background:var(--node);color:var(--ink);cursor:pointer;font-size:12px;font-weight:600}
+  .btn:hover{border-color:var(--muted)} .btn.active{background:var(--lytic);color:#fff;border-color:var(--lytic)}
+  .btn.opt{border-color:var(--benefit);color:var(--benefit)} .btn.opt:hover{background:var(--benefit);color:#fff;border-color:var(--benefit)}
+  .app{display:flex;gap:16px;align-items:flex-start}
+  .editor{width:300px;flex:none;background:var(--panel);border:1px solid var(--grid);border-radius:10px;padding:14px}
+  .editor h3{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:2px 0 8px}
+  .editor .name{width:100%;padding:6px 9px;border:1px solid var(--nodeStroke);border-radius:7px;background:var(--node);color:var(--ink);font-size:13px;font-weight:700;margin-bottom:12px}
+  .tgt{display:flex;align-items:center;gap:8px;padding:5px 7px;border-radius:7px;cursor:pointer;font-size:12.5px;user-select:none}
+  .tgt:hover{background:var(--panel2)} .tgt input{width:15px;height:15px}
+  .tgt.l input{accent-color:var(--lytic)} .tgt.m input{accent-color:var(--morphic)}
+  .tgt .eff{margin-left:auto;font-size:10px;color:var(--muted);font-weight:700}
+  .tgt .dot{width:8px;height:8px;border-radius:50%;flex:none}
+  .divider{height:1px;background:var(--grid);margin:12px 0}
+  .loc{display:block;padding:6px 8px;border-radius:7px;cursor:pointer;font-size:12px;margin-bottom:3px;border:1px solid transparent}
+  .loc:hover{background:var(--panel2)} .loc.sel{border-color:var(--lytic);background:var(--panel2)}
+  .loc small{display:block;color:var(--muted);font-size:10.5px;margin-top:1px}
+  .canvas{flex:1;min-width:0}
+  .scorestrip{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .card{background:var(--panel);border:1px solid var(--grid);border-radius:10px;padding:10px 14px;flex:1;min-width:150px}
+  .card .k{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700}
+  .card .v{font-size:22px;font-weight:800;margin-top:2px}
+  .bar{height:8px;border-radius:5px;background:var(--panel2);overflow:hidden;margin-top:7px}
+  .bar>i{display:block;height:100%;border-radius:5px}
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:800;color:#fff}
+  svg{width:100%;height:auto;display:block}
+  .colhead{font-size:10.5px;font-weight:700;fill:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .node text{fill:var(--ink);font-size:11.5px} .node .tag{font-size:8.5px;font-weight:700;letter-spacing:.3px} .node .rolebadge{font-size:8.5px;font-weight:700;letter-spacing:.3px}
+  .link{fill:none;stroke-linecap:round} .node,.link{transition:opacity .18s} .dimmed{opacity:.12!important} .linkdimmed{opacity:.05!important}
+  .readout{margin-top:14px;background:var(--panel);border:1px solid var(--grid);border-radius:10px;padding:6px 14px 12px}
+  .readout h3{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:10px 0 6px}
+  .ae{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--grid);font-size:12.5px;line-height:1.45}
+  .ae .sv{width:74px;flex:none;font-weight:800;font-size:10.5px;padding-top:1px}
+  .ae .fix{color:var(--muted);font-size:11.5px}
+  .pill{display:inline-block;padding:0 7px;border-radius:20px;font-size:9.5px;font-weight:800;color:#fff;margin-left:5px}
+  .none{color:var(--benefit);font-weight:700;font-size:13px;padding:8px 0}
+  .expl{background:var(--panel2);border-left:4px solid var(--lytic);border-radius:8px;padding:9px 13px;font-size:12.5px;line-height:1.55;margin-bottom:12px}
+  .goalrow{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:12.5px;margin-bottom:8px}
+  .goalrow label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+  .hide{display:none}
+  .foot{font-size:10.5px;color:var(--muted);margin-top:14px;line-height:1.55}
+  .tooltip{position:fixed;pointer-events:none;z-index:20;max-width:260px;background:var(--node);border:1px solid var(--nodeStroke);border-radius:8px;padding:8px 11px;font-size:12px;line-height:1.45;color:var(--ink);box-shadow:0 6px 22px rgba(0,0,0,.18);opacity:0;transition:opacity .1s}
+  .tooltip .tt{font-weight:700;margin-bottom:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Senotherapeutic Placeholder Drug Designer — Inflammaging</h1>
+  <p class="sub">Design a hypothetical anti-aging-inflammation drug across the causal map. Two axes: which nodes it engages (senolytic = clear the senescent cell; senomorphic = silence the SASP), and where it is allowed to act (systemic, PROTAC degrader, or senescent-cell-targeted). The dose-limiting harms are on-target effects in the wrong cell; cell-selective delivery is the lever.</p>
+
+  <div class="topbar">
+    <span class="lbl">Mode</span>
+    <div class="modewrap"><button class="btn active" id="mFwd">Forward — build a drug</button><button class="btn" id="mBwd">Backward — from outcome</button></div>
+    <span class="lbl" style="margin-left:8px">Presets</span>
+    <button class="btn" data-preset="navi">Navitoclax-like</button>
+    <button class="btn" data-preset="dq">D+Q-like</button>
+    <button class="btn opt" data-preset="protac">PROTAC (platelet-sparing)</button>
+    <button class="btn opt" data-preset="ideal">★ Senescent-targeted</button>
+    <button class="btn" id="themeBtn" style="margin-left:auto">Dark</button>
+  </div>
+
+  <div id="bwdPanel" class="expl hide">
+    <div class="goalrow"><b>Design goal:</b><label><input type="checkbox" id="gRev" checked> Must achieve meaningful inflammaging reduction</label></div>
+    <div class="goalrow"><b style="min-width:70px">Avoid:</b>
+      <label><input type="checkbox" class="gAvoid" value="serious" checked> all Serious effects</label>
+      <label><input type="checkbox" class="gAvoid" value="platelets"> Thrombocytopenia</label>
+      <label><input type="checkbox" class="gAvoid" value="immune"> Immunosuppression</label></div>
+    <div class="goalrow"><b style="min-width:70px">Constraint:</b>
+      <label><input type="checkbox" id="gSys"> Systemic delivery only (no targeted formulation)</label>
+      <button class="btn active" id="solveBtn" style="margin-left:auto">Design placeholder →</button></div>
+    <div id="solveMsg" style="margin-top:4px"></div>
+  </div>
+
+  <div class="scorestrip" id="scorestrip"></div>
+
+  <div class="app">
+    <div class="editor">
+      <input class="name" id="pname" value="RR-Sen-1"/>
+      <h3>Senolytics — clear the senescent cell</h3>
+      <div id="lyticList"></div>
+      <div class="divider"></div>
+      <h3>Senomorphics — silence the SASP</h3>
+      <div id="morphicList"></div>
+      <div class="divider"></div>
+      <h3>Delivery / cell-selectivity</h3>
+      <div id="locList"></div>
+    </div>
+    <div class="canvas"><svg id="svg" role="img" aria-label="Senotherapeutic causal map"></svg></div>
+  </div>
+
+  <div class="readout" id="readout"></div>
+
+  <p class="foot">
+    Efficacy weights and severities are <b>illustrative design heuristics</b> for exploring trade-offs, not measured pharmacology. Biology grounded in: senolytic/senomorphic reviews; navitoclax BCL-xL thrombocytopenia; galacto-conjugated (SA-β-gal-activated) and PROTAC senolytics for cell-selectivity; NF-κB/JAK/mTOR/NLRP3/cGAS-STING SASP modulation. "On-target / wrong cell" effects are removable by cell-selective delivery; effects arising in the senescent cell itself (e.g., loss of beneficial transient senescence) are removable only by dropping the target. Not medical advice.
+  </p>
+</div>
+<div class="tooltip" id="tip"></div>
+
+<script>
+const SEV={serious:{ic:'▲',lab:'SERIOUS',hex:'#c4392f',w:25},moderate:{ic:'◆',lab:'MODERATE',hex:'#dd9a1f',w:10},low:{ic:'●',lab:'LOW',hex:'#6b7480',w:3},benefit:{ic:'✓',lab:'BENEFIT',hex:'#2f9e44',w:0}};
+const TISSUE={senescent:'Senescent cell',platelets:'Platelets',marrow:'Bone marrow',immune:'Immune cells (host defense)',cardiac:'Heart',liver:'Liver',gi:'GI mucosa',vasc:'Vasculature',metabolic:'Metabolic / systemic'};
+
+// therapeutic targets. mode: 'l' senolytic, 'm' senomorphic
+const T = {
+ BCLxL:{mode:'l',eff:35,label:'BCL-xL',note:'Navitoclax/A-1331852. Strong senolytic; BCL-xL is on-target in platelets.',aes:[['Thrombocytopenia','platelets','serious'],['Loss of beneficial senescence','senescent','moderate']]},
+ BCL2:{mode:'l',eff:18,label:'BCL-2',note:'Anti-apoptotic; senolytic in some cells.',aes:[['Neutropenia','marrow','moderate']]},
+ SRC:{mode:'l',eff:25,label:'SRC-family',note:'Dasatinib (the D of D+Q). Senescent-cell survival kinase network.',aes:[['Bleeding','platelets','serious'],['Fluid retention / edema','vasc','moderate']]},
+ NaK:{mode:'l',eff:24,label:'Na/K-ATPase',note:'Cardiac glycosides (ouabain) are broad senolytics; on-target in the heart.',aes:[['Cardiac arrhythmia','cardiac','serious']]},
+ HSP90:{mode:'l',eff:24,label:'HSP90',note:'17-DMAG senolytic.',aes:[['Hepatotoxicity','liver','moderate'],['GI upset','gi','low']]},
+ FOXO4:{mode:'l',eff:24,label:'FOXO4–p53',note:'FOXO4-DRI peptide releases p53 to trigger senescent apoptosis.',aes:[['Cytopenia','marrow','moderate'],['Loss of beneficial senescence','senescent','moderate']]},
+ GLS1:{mode:'l',eff:18,label:'GLS1',note:'Glutaminase; senescent cells depend on glutaminolysis.',aes:[['GI upset','gi','low']]},
+ PI3K:{mode:'l',eff:20,label:'PI3K / AKT',note:'Survival signalling; part of the senolytic network (quercetin/fisetin).',aes:[['Hyperglycemia','metabolic','moderate'],['Immunosuppression','immune','moderate']]},
+ NFkB:{mode:'m',eff:30,label:'NF-κB (IKK)',note:'Master SASP transcriptional driver. On-target in host-defense immunity.',aes:[['Immunosuppression / infection','immune','serious']]},
+ JAK:{mode:'m',eff:28,label:'JAK1/2',note:'Ruxolitinib; IL-6/STAT3 SASP axis.',aes:[['Immunosuppression / infection','immune','serious'],['Anemia / cytopenia','marrow','moderate']]},
+ mTOR:{mode:'m',eff:28,label:'mTOR',note:'Rapamycin; suppresses SASP + boosts autophagy.',aes:[['Immunosuppression','immune','moderate'],['Mucositis / mouth ulcers','gi','moderate'],['Hyperglycemia / dyslipidemia','metabolic','moderate']]},
+ p38:{mode:'m',eff:24,label:'p38 MAPK',note:'SASP stress-kinase.',aes:[['Hepatotoxicity','liver','moderate'],['GI upset','gi','low']]},
+ NLRP3:{mode:'m',eff:24,label:'NLRP3',note:'Inflammasome / IL-1β; MCC950-class, comparatively selective.',aes:[['Infection risk','immune','moderate']]},
+ STING:{mode:'m',eff:22,label:'cGAS–STING',note:'Cytosolic-DNA sensing drives SASP in senescence.',aes:[['Impaired antiviral immunity','immune','moderate']]},
+ IL6R:{mode:'m',eff:18,label:'IL-6 / IL-6R',note:'Tocilizumab; key SASP cytokine.',aes:[['Infection','immune','moderate'],['Neutropenia','marrow','low']]},
+};
+const byId=T; const ids=Object.keys(T);
+const ALLT=Object.keys(TISSUE);
+const LOC={
+ systemic:{label:'Systemic',desc:'Reaches every cell — no protection from off-cell effects',tissues:ALLT},
+ protac:{label:'PROTAC degrader',desc:'Spares platelets (no cereblon to execute degradation)',tissues:ALLT.filter(x=>x!=='platelets')},
+ senescent:{label:'Senescent-cell-targeted',desc:'SA-β-gal / galacto-prodrug: acts only in senescent cells',tissues:['senescent']},
+};
+const REV=40;
+let state={name:'RR-Sen-1',hit:new Set(['BCLxL','NFkB']),loc:'systemic',mode:'fwd'},pinned=null;
+
+function reach(){return new Set(LOC[state.loc].tissues);}
+function compute(){
+  const r=reach(); let eff=0; state.hit.forEach(id=>eff+=T[id].eff); eff=Math.min(100,eff);
+  const active={};
+  state.hit.forEach(id=>T[id].aes.forEach(([label,t,s])=>{ if(r.has(t)){
+    if(!active[label]||SEV[s].w>SEV[active[label].s].w) active[label]={label,t,s,srcs:[]};
+    active[label].srcs.push(id);
+  }}));
+  const aes=Object.values(active).sort((a,b)=>SEV[b.s].w-SEV[a.s].w);
+  const pen=aes.reduce((x,a)=>x+SEV[a.s].w,0);
+  return {eff,reversal:eff>=REV,aes,score:Math.max(0,eff-pen),nSerious:aes.filter(a=>a.s==='serious').length};
+}
+
+function renderEditor(){
+  const ll=document.getElementById('lyticList'),ml=document.getElementById('morphicList');ll.innerHTML='';ml.innerHTML='';
+  ids.forEach(id=>{const t=T[id];const d=document.createElement('label');d.className='tgt '+t.mode;
+    const col=t.mode==='l'?'var(--lytic)':'var(--morphic)';
+    d.innerHTML=`<input type="checkbox" ${state.hit.has(id)?'checked':''}><span class="dot" style="background:${col}"></span>${t.label}<span class="eff">eff ${t.eff}</span>`;
+    d.title=t.note||'';d.querySelector('input').addEventListener('change',e=>{e.target.checked?state.hit.add(id):state.hit.delete(id);render();});
+    (t.mode==='l'?ll:ml).appendChild(d);});
+  const lc=document.getElementById('locList');lc.innerHTML='';
+  Object.entries(LOC).forEach(([k,v])=>{const d=document.createElement('div');d.className='loc'+(state.loc===k?' sel':'');
+    d.innerHTML=`<b>${v.label}</b><small>${v.desc}</small>`;d.addEventListener('click',()=>{state.loc=k;render();});lc.appendChild(d);});
+}
+
+const svg=document.getElementById('svg'),NS='http://www.w3.org/2000/svg';
+const colX=[20,215,470,760],colW=[150,150,180,300],TOP=48,GAPIN=10,GAPG=22,LH=14,maxC=[16,16,20,32];
+function wrap(t,m){const w=t.split(' '),ls=[];let c='';w.forEach(x=>{if((c+' '+x).trim().length>m){if(c)ls.push(c);c=x;}else c=(c+' '+x).trim();});if(c)ls.push(c);return ls;}
+function renderDiagram(r){
+  const nodes=[],edges=[],seen={};
+  function add(id,layer,label,kind,extra){if(seen[id])return;seen[id]={id,layer,label,kind,...(extra||{})};nodes.push(seen[id]);}
+  add('PH',0,state.name||'Placeholder',r.reversal?'phgood':'ph');
+  const hit=[...state.hit];
+  if(r.eff>0){add('senescent',2,TISSUE.senescent,'tissue');
+    add('OUT_red',3,'Inflammaging reduction',r.reversal?'benefit':'benefitweak',{sev:'benefit',sub:r.reversal?'✓ ACHIEVED':'partial ('+r.eff+')'});
+    hit.forEach(id=>{add('T_'+id,1,T[id].label,T[id].mode==='l'?'lytic':'morphic');edges.push(['PH','T_'+id,T[id].mode==='l'?'lytic':'morphic']);edges.push(['T_'+id,'senescent',T[id].mode==='l'?'lytic':'morphic']);});
+    edges.push(['senescent','OUT_red','benefit']);}
+  r.aes.forEach(a=>{const oid='OUT_'+a.label.replace(/[^a-z]/gi,'');add(oid,3,a.label,'ae',{sev:a.s});add(a.t,2,TISSUE[a.t],'tissue');
+    a.srcs.forEach(sid=>{add('T_'+sid,1,T[sid].label,T[sid].mode==='l'?'lytic':'morphic');edges.push(['PH','T_'+sid,T[sid].mode==='l'?'lytic':'morphic']);edges.push(['T_'+sid,a.t,a.s]);});
+    edges.push([a.t,oid,a.s]);});
+  const geo={},colH=[0,0,0,0];
+  for(let L=0;L<4;L++){const ns=nodes.filter(n=>n.layer===L);let y=0,last=null;
+    ns.forEach(n=>{if(last!==null)y+=(L===1&&n.kind!==last?GAPG:GAPIN);const lines=wrap(n.label,maxC[L]);let h=Math.max(30,lines.length*LH+14);if(n.layer===3)h=Math.max(38,lines.length*LH+26);
+      geo[n.id]={x:colX[L],w:colW[L],y,h,lines};y+=h;last=n.kind;});colH[L]=y;}
+  const H=Math.max(...colH,80);
+  for(let L=0;L<4;L++){const ns=nodes.filter(n=>n.layer===L);const off=(H-colH[L])/2;ns.forEach(n=>geo[n.id].y+=off+TOP);}
+  const totalH=H+TOP+16,totalW=colX[3]+colW[3]+6;svg.setAttribute('viewBox',`0 0 ${totalW} ${totalH}`);svg.innerHTML='';
+  ['PLACEHOLDER','TARGET','CELL / TISSUE','OUTCOME'].forEach((h,i)=>{const t=document.createElementNS(NS,'text');t.setAttribute('x',colX[i]);t.setAttribute('y',28);t.setAttribute('class','colhead');t.textContent=h;svg.appendChild(t);});
+  const colOf=k=>({lytic:'var(--lytic)',morphic:'var(--morphic)',benefit:'var(--benefit)',tissue:'var(--tissue)'}[k]);
+  edges.forEach(([a,b,k])=>{if(!geo[a]||!geo[b])return;const ga=geo[a],gb=geo[b];const x1=ga.x+ga.w,y1=ga.y+ga.h/2,x2=gb.x,y2=gb.y+gb.h/2,mx=(x1+x2)/2;
+    const p=document.createElementNS(NS,'path');p.setAttribute('d',`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+    p.setAttribute('stroke',SEV[k]?`var(--${k})`:colOf(k));p.setAttribute('fill','none');p.setAttribute('stroke-width',k==='serious'?2.4:2);p.setAttribute('stroke-linecap','round');p.setAttribute('opacity',.6);svg.appendChild(p);});
+  nodes.forEach(n=>{const g=geo[n.id];const gEl=document.createElementNS(NS,'g');gEl.setAttribute('class','node');
+    const accent=n.kind==='ae'?`var(--${n.sev})`:(n.kind==='benefit'||n.kind==='benefitweak')?'var(--benefit)':n.kind==='lytic'?'var(--lytic)':n.kind==='morphic'?'var(--morphic)':n.kind==='tissue'?'var(--tissue)':n.kind==='phgood'?'var(--benefit)':'var(--lytic)';
+    const rect=document.createElementNS(NS,'rect');rect.setAttribute('x',g.x);rect.setAttribute('y',g.y);rect.setAttribute('width',g.w);rect.setAttribute('height',g.h);rect.setAttribute('rx',7);rect.setAttribute('fill','var(--node)');rect.setAttribute('stroke','var(--nodeStroke)');rect.setAttribute('stroke-width','1.2');gEl.appendChild(rect);
+    if(n.layer===3){const tint=document.createElementNS(NS,'rect');tint.setAttribute('x',g.x);tint.setAttribute('y',g.y);tint.setAttribute('width',g.w);tint.setAttribute('height',g.h);tint.setAttribute('rx',7);tint.setAttribute('fill',accent);tint.setAttribute('opacity',.1);gEl.appendChild(tint);}
+    const acc=document.createElementNS(NS,'rect');acc.setAttribute('x',g.x);acc.setAttribute('y',g.y);acc.setAttribute('width',4.5);acc.setAttribute('height',g.h);acc.setAttribute('rx',2);acc.setAttribute('fill',accent);gEl.appendChild(acc);
+    const tx=g.x+12;let ty=g.y+(n.layer===3?15:g.h/2-(g.lines.length-1)*LH/2+4);
+    const t=document.createElementNS(NS,'text');t.setAttribute('x',tx);t.setAttribute('y',ty);t.setAttribute('style',`font-weight:${n.layer===0?800:(n.layer===1?600:500)}`);
+    g.lines.forEach((ln,i)=>{const ts=document.createElementNS(NS,'tspan');ts.setAttribute('x',tx);ts.setAttribute('dy',i?LH:0);ts.textContent=ln;t.appendChild(ts);});gEl.appendChild(t);
+    if(n.layer===3){const tag=document.createElementNS(NS,'text');tag.setAttribute('x',tx);tag.setAttribute('y',g.y+g.h-8);tag.setAttribute('class','tag');tag.setAttribute('fill',accent);tag.textContent=n.sub||(SEV[n.sev].ic+' '+SEV[n.sev].lab);gEl.appendChild(tag);}
+    if(n.layer===1){const rb=document.createElementNS(NS,'text');rb.setAttribute('x',g.x+g.w-9);rb.setAttribute('y',g.y+14);rb.setAttribute('text-anchor','end');rb.setAttribute('class','rolebadge');rb.setAttribute('fill',accent);rb.textContent=n.kind==='lytic'?'SENOLYTIC':'SENOMORPHIC';gEl.appendChild(rb);}
+    svg.appendChild(gEl);
+    const nid=n.id;gEl.addEventListener('mouseenter',e=>{tipShow(e,n);});gEl.addEventListener('mousemove',tipMove);gEl.addEventListener('mouseleave',tipHide);
+  });
+}
+const tip=document.getElementById('tip');
+function tipShow(e,n){const T2=T[n.id&&n.id.replace('T_','')];let h=`<div class="tt">${n.label}</div>`;
+  if(n.layer===1&&T[n.id.replace('T_','')]){const tt=T[n.id.replace('T_','')];h+=`<div style="color:var(--muted);font-size:11px">${tt.mode==='l'?'Senolytic':'Senomorphic'} · efficacy ${tt.eff}</div>`+(tt.note?`<div style="margin-top:4px">${tt.note}</div>`:'');}
+  tip.innerHTML=h;tip.style.opacity=1;tipMove(e);}
+function tipMove(e){const w=tip.offsetWidth,ht=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;if(x+w>innerWidth)x=e.clientX-w-14;if(y+ht>innerHeight)y=e.clientY-ht-14;tip.style.left=x+'px';tip.style.top=y+'px';}
+function tipHide(){tip.style.opacity=0;}
+
+function renderScore(r){const strip=document.getElementById('scorestrip');const effCol=r.reversal?'var(--benefit)':'var(--moderate)';
+  strip.innerHTML=`
+   <div class="card"><div class="k">Predicted efficacy</div><div class="v" style="color:${effCol}">${r.eff}<span style="font-size:13px;color:var(--muted)">/100</span></div><div class="bar"><i style="width:${r.eff}%;background:${effCol}"></i></div></div>
+   <div class="card"><div class="k">Inflammaging reduction</div><div class="v"><span class="badge" style="background:${r.reversal?'var(--benefit)':'var(--moderate)'}">${r.reversal?'ACHIEVED':'INSUFFICIENT'}</span></div></div>
+   <div class="card"><div class="k">Adverse effects</div><div class="v">${r.aes.length} <span style="font-size:13px;color:var(--serious)">(${r.nSerious} serious)</span></div></div>
+   <div class="card"><div class="k">Design score</div><div class="v" style="color:${r.score>=40?'var(--benefit)':r.score>0?'var(--moderate)':'var(--serious)'}">${r.score}</div><div class="bar"><i style="width:${r.score}%;background:${r.score>=40?'var(--benefit)':'var(--moderate)'}"></i></div></div>`;}
+function renderReadout(r){const el=document.getElementById('readout');let h=`<h3>Active adverse effects — and how to remove each</h3>`;
+  if(!r.aes.length){h+=`<div class="none">✓ No adverse effects active under this design. `+(state.loc==='senescent'?'Senescent-cell targeting neutralizes every off-cell liability.':'')+`</div>`;}
+  else r.aes.forEach(a=>{const srcs=a.srcs.map(s=>T[s].label).join(', ');
+    const fix=a.t==='senescent'?`Arises in the senescent cell itself (clearing cells with beneficial transient roles). Cannot be localized away — remove only by dropping ${srcs} (−efficacy).`
+      :`On-target in ${TISSUE[a.t]} — not removable by target choice alone. Remove by cell-selective delivery (act only in senescent cells) or drop ${srcs} (−efficacy).`;
+    h+=`<div class="ae"><span class="sv" style="color:${SEV[a.s].hex}">${SEV[a.s].ic} ${SEV[a.s].lab}</span><div><b>${a.label}</b> <span class="pill" style="background:${a.t==='senescent'?'#8a6d3b':'#7a8595'}">${a.t==='senescent'?'INTRINSIC TO SENOLYSIS':'ON-TARGET / WRONG CELL'}</span><div class="fix">${fix}</div></div></div>`;});
+  el.innerHTML=h;}
+function render(){document.getElementById('pname').value=state.name;const r=compute();renderEditor();renderDiagram(r);renderScore(r);renderReadout(r);}
+
+function solve(){const requireRev=document.getElementById('gRev').checked;const avoid=[...document.querySelectorAll('.gAvoid:checked')].map(c=>c.value);const sysOnly=document.getElementById('gSys').checked;
+  const locs=sysOnly?['systemic']:['systemic','protac','senescent'];const locRank={systemic:0,protac:1,senescent:2};let best=null;
+  for(let mask=1;mask<(1<<ids.length);mask++){const hit=new Set();ids.forEach((id,i)=>{if(mask&(1<<i))hit.add(id);});
+    for(const loc of locs){const sv={h:state.hit,l:state.loc};state.hit=hit;state.loc=loc;const r=compute();state.hit=sv.h;state.loc=sv.l;
+      if(requireRev&&!r.reversal)continue;let ok=true;
+      for(const a of r.aes){if(avoid.includes('serious')&&a.s==='serious'){ok=false;break;}if(avoid.includes('platelets')&&a.t==='platelets'){ok=false;break;}if(avoid.includes('immune')&&a.t==='immune'){ok=false;break;}}
+      if(!ok)continue;const cand={hit,loc,r,n:hit.size};
+      if(!best||better(cand,best,locRank))best=cand;}}
+  const msg=document.getElementById('solveMsg');
+  if(!best){msg.innerHTML=`<b style="color:var(--serious)">No placeholder satisfies these constraints.</b> `+(sysOnly?`With systemic delivery the on-target/off-cell harms (thrombocytopenia from BCL-xL, immunosuppression from NF-κB/JAK) cannot be avoided while keeping efficacy. Allow a targeted formulation and try again — <b>cell-selectivity is the lever.</b>`:`Loosen a constraint.`);return;}
+  state.hit=new Set(best.hit);state.loc=best.loc;state.name='RR-Auto';
+  const names=[...best.hit].map(id=>T[id].label).join(' + ');
+  msg.innerHTML=`<b style="color:var(--benefit)">Solution found.</b> Hit <b>${names}</b>, delivered <b>${LOC[best.loc].label.toLowerCase()}</b> → efficacy ${best.r.eff}, ${best.r.aes.length} adverse effect(s). `+(best.loc==='systemic'?`A systemic design works here.`:`Required a <b>${LOC[best.loc].label}</b> formulation — no systemic-only design met the goal, because the residual harms are on-target in the wrong cell.`);
+  render();}
+function better(a,b,lr){if(a.r.aes.length!==b.r.aes.length)return a.r.aes.length<b.r.aes.length;if(a.r.eff!==b.r.eff)return a.r.eff>b.r.eff;if(lr[a.loc]!==lr[b.loc])return lr[a.loc]<lr[b.loc];return a.n<b.n;}
+
+const PRESETS={
+ navi:{name:'Navitoclax-like',hit:['BCLxL','BCL2'],loc:'systemic'},
+ dq:{name:'D+Q-like',hit:['SRC','PI3K'],loc:'systemic'},
+ protac:{name:'PROTAC (platelet-sparing)',hit:['BCLxL'],loc:'protac'},
+ ideal:{name:'RR-Sen · senescent-targeted',hit:['NaK','HSP90','GLS1','NFkB','NLRP3'],loc:'senescent'},
+};
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=PRESETS[b.dataset.preset];state.name=p.name;state.hit=new Set(p.hit);state.loc=p.loc;render();}));
+document.getElementById('pname').addEventListener('input',e=>{state.name=e.target.value;renderDiagram(compute());});
+document.getElementById('mFwd').addEventListener('click',()=>{state.mode='fwd';document.getElementById('mFwd').classList.add('active');document.getElementById('mBwd').classList.remove('active');document.getElementById('bwdPanel').classList.add('hide');});
+document.getElementById('mBwd').addEventListener('click',()=>{state.mode='bwd';document.getElementById('mBwd').classList.add('active');document.getElementById('mFwd').classList.remove('active');document.getElementById('bwdPanel').classList.remove('hide');});
+document.getElementById('solveBtn').addEventListener('click',solve);
+document.getElementById('themeBtn').addEventListener('click',()=>{document.body.classList.toggle('dark');document.getElementById('themeBtn').textContent=document.body.classList.contains('dark')?'Light':'Dark';});
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+name,node,cid,MW,cLogP,TPSA,HBD,HBA,RotB,ArRings,QED,Ro5_viol,Veber_pass,n_alerts,hERG_flag
+navitoclax,BCL-xL/BCL-2,24978538,974.6,8.83,128.4,2,11,16,4,0.105,3,False,0,False
+venetoclax,BCL-2,49846579,868.5,8.66,172.0,3,11,13,5,0.076,3,False,2,False
+dasatinib,SRC-family,3062316,488.0,3.31,106.5,3,9,7,3,0.466,0,True,0,False
+fisetin,PI3K/AKT network,5281614,286.2,2.28,111.1,4,6,1,3,0.511,0,True,2,False
+quercetin,PI3K/AKT network,5280343,302.2,1.99,131.4,5,7,1,3,0.434,0,True,2,False
+ruxolitinib,JAK1/2,25126798,306.4,3.47,83.2,1,4,4,3,0.8,0,True,0,False
+sirolimus,mTOR,5284616,914.2,6.18,195.4,3,13,6,0,0.156,3,False,2,False
+telaglenastat,GLS1,71577426,571.6,4.55,131.9,2,9,12,4,0.237,1,False,1,False
+alvespimycin,HSP90,5288674,616.8,1.91,169.5,4,10,7,0,0.245,1,False,3,False
+MCC950,NLRP3,9910393,404.5,2.99,108.6,3,5,4,2,0.726,0,True,0,False
+losmapimod,p38 MAPK,11552706,383.5,3.86,71.1,2,3,5,2,0.823,0,True,0,False
+DT2216,BCL-xL PROTAC,139331475,1542.4,12.4,251.1,5,17,28,6,0.023,3,False,1,False

@@ -1,0 +1,163 @@
+# =====================================================================
+# REINVENT4 scoring specification
+# Profile: SENESCENT-CELL-TARGETED senotherapeutic candidate (inflammaging)
+#   HIT    : senolytic / senomorphic nodes (e.g. BCL-xL, GLS1, HSP90; or a
+#            senomorphic core: NF-kB/IKK, JAK, mTOR, NLRP3)
+#   SPARE  : hERG (cardiac/QT) and — the distinctive term — reward a
+#            beta-galactosidase-CLEAVABLE pro-moiety so the molecule is
+#            uncaged (activated) only in senescent cells (high SA-beta-gal).
+#   plus drug-likeness / synthesizability / ADMET constraints
+#
+# Usage:  reinvent -l run.log staged_learning.toml
+#         (embed this [scoring] block in a REINVENT4 staged_learning config)
+#
+# IMPORTANT — this is an ADAPT-ME TEMPLATE:
+#  * Component names/keys follow the REINVENT4 family schema; adjust to the
+#    exact version you install (`reinvent --version`).
+#  * Every "predictive" component references a QSAR model YOU must train first
+#    (QSARtuna / Chemprop on ChEMBL pIC50 for each node). .pkl paths are placeholders.
+#  * The galacto-caging term is expressed here as a substructure-reward (presence
+#    of a beta-D-galactopyranosyl-O linkage that a glycosidase can cleave). In a
+#    real run, pair it with a stability/ADMET model for the un-caged payload.
+#  * Validate generated molecules with SwissTargetPrediction / SEA / ADMET-AI.
+# =====================================================================
+
+[scoring]
+type = "geometric_mean"   # ALL endpoints must be satisfied (no averaging away a failure)
+
+# ------------------------- ON-TARGETS (reward potency) -------------------------
+# Reward predicted pIC50 rising from ~6 (weak) to ~9 (strong).
+# Swap these node names for the route you are designing (senolytic vs senomorphic).
+
+[[scoring.component]]
+[scoring.component.Qptuna]
+[[scoring.component.Qptuna.endpoint]]
+name = "BCLxL_pIC50"
+weight = 1.0
+params.model_file = "models/BCLxL_qsar.pkl"
+transform.type = "sigmoid"
+transform.low = 6.0
+transform.high = 9.0
+transform.k = 0.5
+
+[[scoring.component]]
+[scoring.component.Qptuna]
+[[scoring.component.Qptuna.endpoint]]
+name = "GLS1_pIC50"
+weight = 1.0
+params.model_file = "models/GLS1_qsar.pkl"
+transform.type = "sigmoid"
+transform.low = 6.0
+transform.high = 9.0
+transform.k = 0.5
+
+[[scoring.component]]
+[scoring.component.Qptuna]
+[[scoring.component.Qptuna.endpoint]]
+name = "NFkB_IKK_pIC50"
+weight = 1.0
+params.model_file = "models/IKKb_qsar.pkl"
+transform.type = "sigmoid"
+transform.low = 6.0
+transform.high = 9.0
+transform.k = 0.5
+
+# ------------------------- SENESCENT-CELL ACTIVATION (the localization lever) -------------------------
+# Reward a beta-galactosidase-cleavable pro-moiety: the payload is masked by a
+# beta-D-galactopyranoside and released only where SA-beta-gal is high (senescent
+# cells). This is what turns an on-target/off-cell liability into an on-cell-only one.
+[[scoring.component]]
+[scoring.component.MatchingSubstructure]
+[[scoring.component.MatchingSubstructure.endpoint]]
+name = "galacto_caged"
+weight = 1.2
+# beta-D-galactopyranosyl-O- (glycosidic O to the payload); adjust stereo SMARTS to taste
+params.smarts = ["OC[C@H]1O[C@@H](O*)[C@H](O)[C@@H](O)[C@@H]1O"]
+
+# ------------------------- ANTI-TARGETS (penalize potency) -------------------------
+# reverse_sigmoid: score ~1 when predicted activity is LOW, ~0 when HIGH.
+# hERG weighted hardest (cardiac node). "BCLxL_FREE" penalizes platelet-relevant
+# engagement in the UN-caged form — pair with the galacto term so potency is
+# expressed only after senescent-cell activation.
+
+[[scoring.component]]
+[scoring.component.Qptuna]
+[[scoring.component.Qptuna.endpoint]]
+name = "hERG_pIC50_avoid"
+weight = 1.5
+params.model_file = "models/hERG_qsar.pkl"
+transform.type = "reverse_sigmoid"
+transform.low = 5.0
+transform.high = 7.0
+transform.k = 0.5
+
+[[scoring.component]]
+[scoring.component.Qptuna]
+[[scoring.component.Qptuna.endpoint]]
+name = "platelet_BCLxL_free_avoid"
+weight = 1.0
+params.model_file = "models/BCLxL_uncaged_qsar.pkl"
+transform.type = "reverse_sigmoid"
+transform.low = 5.5
+transform.high = 7.5
+transform.k = 0.5
+
+# ------------------------- DRUG-LIKENESS / SYNTHESIZABILITY -------------------------
+[[scoring.component]]
+[scoring.component.QED]
+[[scoring.component.QED.endpoint]]
+name = "QED"
+weight = 0.6
+
+[[scoring.component]]
+[scoring.component.SAScore]
+[[scoring.component.SAScore.endpoint]]
+name = "SA_score"
+weight = 0.6
+transform.type = "reverse_sigmoid"   # lower SA score = easier to make = better
+transform.low = 2.0
+transform.high = 6.0
+transform.k = 0.5
+
+[[scoring.component]]
+[scoring.component.MolecularWeight]
+[[scoring.component.MolecularWeight.endpoint]]
+name = "MW"
+weight = 0.4
+transform.type = "double_sigmoid"     # galacto-caged payloads run large; allow to ~650
+transform.low = 300.0
+transform.high = 650.0
+transform.coef_div = 650.0
+transform.coef_si = 20.0
+transform.coef_se = 20.0
+
+[[scoring.component]]
+[scoring.component.SlogP]
+[[scoring.component.SlogP.endpoint]]
+name = "SlogP"
+weight = 0.4
+transform.type = "double_sigmoid"     # favor logP ~1-4
+transform.low = 1.0
+transform.high = 4.0
+transform.coef_div = 4.0
+transform.coef_si = 20.0
+transform.coef_se = 20.0
+
+# ------------------------- STRUCTURAL ALERTS -------------------------
+[[scoring.component]]
+[scoring.component.custom_alerts]
+[[scoring.component.custom_alerts.endpoint]]
+name = "unwanted_substructures"
+params.smarts = [
+  "C(=O)Cl",               # acyl halide
+  "[SX2H0][SX2H0]",        # disulfide
+  "N=[N+]=[N-]",           # azide
+  "[OX1]=[C]-[C]=[OX1]",   # 1,2-dicarbonyl (flavonoid-style PAINS proxy; tune)
+]
+
+# ---------------------------------------------------------------------
+# Optional additions once the QSAR models are in place:
+#  * Docking into BCL-xL/BCL-2 BH3 groove or the GLS1 allosteric site.
+#  * A "cleaved-payload" ADMET pass (the active species after glycosidase release).
+#  * Selectivity margin: on-node pIC50 minus platelet/immune off-node pIC50.
+# ---------------------------------------------------------------------
