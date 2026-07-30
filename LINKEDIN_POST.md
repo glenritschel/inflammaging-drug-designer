@@ -24,13 +24,23 @@ So the lever that actually works isn't selectivity. It's **localization** — co
 
 (It's a conceptual model — illustrative weights, not validated potencies — built to make the trade-off *legible*, not to rank real compounds.)
 
-🔗 Tool + code: github.com/glenritschel/inflammaging-drug-designer
+🔗 Try the tool, code, and preprint — links in the first comment.
 
 Built in collaboration with Claude — it did the analysis, coding, and figures from my direction.
 
 Is localization an underrated design axis in senotherapeutics?
 
 #Longevity #Senolytics #Inflammaging #DrugDiscovery #ComputationalBiology #DrugDelivery #AgingResearch
+
+---
+
+## First comment (post immediately after publishing)
+
+Links:
+▶️ Run it in your browser (no install): https://glenritschel.github.io/inflammaging-drug-designer
+💻 Code + reproducible analysis: https://github.com/glenritschel/inflammaging-drug-designer
+📄 Preprint: https://doi.org/10.5281/zenodo.21696338
+📑 Provisional patent specification: https://doi.org/10.5281/zenodo.21696296
 
 ---
 
